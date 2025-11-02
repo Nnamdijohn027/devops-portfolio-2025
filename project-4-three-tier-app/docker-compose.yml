@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"  # Changed from 5432 to 5433
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"  # Changed from 5000 to 5001
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: mydb
+      DB_PORT: 5432
+      NODE_ENV: development
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:80"    # Changed from 3000 to 3001
+    environment:
+      REACT_APP_API_URL: http://localhost:5001  # Updated to match new port
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
